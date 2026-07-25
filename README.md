@@ -1,5 +1,11 @@
 # Smart Home BLE Demo
 
+## Screenshots
+
+| Nearby devices | Smart Home control | Utolsó eszköz kijelzése |
+|---|---|---|
+| ![Nearby devices](screenshots/scan-screen.jpg) | ![Smart Home control](screenshots/control-screen.jpg) | ![Last connected device](screenshots/control-screen-last-device.jpg) |
+
 ## What is this?
 A small but full-featured Android app (Kotlin + Jetpack Compose + Hilt) that acts as a "BLE hub":
 finds nearby Bluetooth Low Energy devices, connects via GATT, discovers a custom
