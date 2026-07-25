@@ -1,4 +1,4 @@
-# Smart Home BLE Demo
+# Smart Home BLE Demo 🏠 (branch verzió)
 
 ## Screenshots
 
