@@ -1,4 +1,6 @@
-# Smart Home BLE Demo — Kotlin + Compose
+
+# Smart Home BLE Demo 🏠 — Kotlin + Compose
+
 
 ## Screenshots
 
