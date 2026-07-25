@@ -55,4 +55,14 @@ class ScanViewModel @Inject constructor(
         super.onCleared()
         scanJob?.cancel()
     }
+
+    companion object {
+        fun filterDevices(devices: List<ScannedDevice>, query: String): List<ScannedDevice> {
+            if (query.isBlank()) return devices
+            return devices.filter { device ->
+                device.name?.contains(query, ignoreCase = true) == true ||
+                        device.address.contains(query, ignoreCase = true)
+            }
+        }
+    }
 }

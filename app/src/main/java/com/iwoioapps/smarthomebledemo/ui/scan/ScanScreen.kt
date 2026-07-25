@@ -91,14 +91,7 @@ fun ScanScreen(
     var searchQuery by remember { mutableStateOf("") }
 
     val filteredDevices = remember(devices, searchQuery) {
-        if (searchQuery.isBlank()) {
-            devices
-        } else {
-            devices.filter { device ->
-                device.name?.contains(searchQuery, ignoreCase = true) == true ||
-                        device.address.contains(searchQuery, ignoreCase = true)
-            }
-        }
+        ScanViewModel.filterDevices(devices, searchQuery)
     }
 
     Box(
