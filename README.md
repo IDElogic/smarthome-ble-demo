@@ -51,3 +51,5 @@ Simulate the "peripheral" side with a free app on a second Android phone:
 
 6. On your primary phone, open this app, tap "Search for devices", select the advertising device,
 then toggle the switch / drag the slider. nRF Connect shows incoming writes live, and you can send a notification from nRF Connect to see the light bulb icon animation in the app.
+   
+7. Teszt módosítás egy branch-en.
