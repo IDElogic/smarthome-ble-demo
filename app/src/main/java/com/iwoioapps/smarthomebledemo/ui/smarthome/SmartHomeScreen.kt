@@ -142,6 +142,13 @@ fun SmartHomeScreen(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                    Text(
+                        text = "Utoljára csatlakoztatva: ${viewModel.deviceAddress}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Wheat.copy(alpha = 0.6f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
                 Icon(
                     imageVector = Icons.Filled.Bluetooth,
