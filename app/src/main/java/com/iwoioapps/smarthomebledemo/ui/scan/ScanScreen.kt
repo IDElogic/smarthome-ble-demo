@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -87,6 +88,18 @@ fun ScanScreen(
     val devices by viewModel.devices.collectAsState()
     val isScanning by viewModel.isScanning.collectAsState()
     val error by viewModel.error.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredDevices = remember(devices, searchQuery) {
+        if (searchQuery.isBlank()) {
+            devices
+        } else {
+            devices.filter { device ->
+                device.name?.contains(searchQuery, ignoreCase = true) == true ||
+                        device.address.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -150,19 +163,37 @@ fun ScanScreen(
 
             Spacer(Modifier.height(20.dp))
 
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Keresés név vagy cím alapján") },
+                singleLine = true
+            )
+
+            Spacer(Modifier.height(16.dp))
+
             if (devices.isEmpty() && !isScanning) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         text = "No devices found yet. Tap scan and make sure your simulator " +
-                            "(e.g. nRF Connect GATT Server) is advertising with the demo's service UUID.",
+                                "(e.g. nRF Connect GATT Server) is advertising with the demo's service UUID.",
                         color = Zuzmo,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }
+            } else if (filteredDevices.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "Nincs a keresésnek megfelelő eszköz.",
+                        color = Zuzmo,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             } else {
                 LazyColumn {
-                    items(devices) { device ->
+                    items(filteredDevices) { device ->
                         DeviceRow(device = device, onClick = { onDeviceSelected(device.address) })
                         Spacer(modifier = Modifier.height(10.dp))
                     }
