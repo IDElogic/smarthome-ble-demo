@@ -12,8 +12,10 @@ sealed class ConnectionState {
 data class ScannedDevice(
     val name: String?,
     val address: String,
-    val rssi: Int
+    val rssi: Int,
+    val temperature: Float? = null  // null, ha az eszköz nem küld hőmérsékletet
 )
+
 
 data class SwitchState(
     val isOn: Boolean = false,
