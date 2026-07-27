@@ -168,13 +168,37 @@ fun ScanScreen(
 
             if (devices.isEmpty() && !isScanning) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "No devices found yet. Tap scan and make sure your simulator " +
-                                "(e.g. nRF Connect GATT Server) is advertising with the demo's service UUID.",
-                        color = Zuzmo,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
+                    Column(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "No Smart Home device found.",
+                            color = Wheat,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Possible reasons:",
+                            color = Zuzmo,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        listOf(
+                            "• The device is powered off or out of range",
+                            "• Bluetooth permission is not granted",
+                            "• The device is not advertising the demo service UUID",
+                            "• Try moving closer to the device"
+                        ).forEach { tip ->
+                            Text(
+                                text = tip,
+                                color = Zuzmo,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
                 }
             } else if (filteredDevices.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

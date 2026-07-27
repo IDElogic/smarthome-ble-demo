@@ -18,35 +18,44 @@ import javax.inject.Singleton
  * of the app can just `collect` scan results with coroutines.
  */
 
-
 @Singleton
 class BleScanner @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter
 ) {
     @SuppressLint("MissingPermission")
+
     fun scan(filterByServiceUuid: Boolean = true): Flow<ScannedDevice> = callbackFlow {
         val scanner = bluetoothAdapter.bluetoothLeScanner
             ?: throw IllegalStateException("Bluetooth is off or unsupported on this device.")
 
-        val seenAddresses = mutableSetOf<String>()
+        // Eddig csak címeket tároltunk egy set-ben.
+        // Most teljes ScannedDevice-et tárolunk cím szerint,
+        // hogy meg tudjuk nézni, változott-e valami.
+        val lastSeenByAddress = mutableMapOf<String, ScannedDevice>()
         val producerScope = this
 
         val callback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 val address = result.device.address
-                if (seenAddresses.add(address)) {
-                    producerScope.trySend(
-                        ScannedDevice(
-                            name = result.device.name ?: result.scanRecord?.deviceName,
-                            address = address,
-                            rssi = result.rssi
-                        )
-                    )
+                val newDevice = ScannedDevice(
+                    name = result.device.name ?: result.scanRecord?.deviceName,
+                    address = address,
+                    rssi = result.rssi
+                )
+
+                val previous = lastSeenByAddress[address]
+
+                if (shouldEmitUpdatedDevice(previous, newDevice)) {
+                    lastSeenByAddress[address] = newDevice
+                    producerScope.trySend(newDevice)
                 }
+
             }
 
             override fun onScanFailed(errorCode: Int) {
-                producerScope.close(IllegalStateException("BLE scan failed with error code $errorCode"))
+                producerScope.close(
+                    IllegalStateException("BLE scan failed with error code $errorCode")
+                )
             }
         }
 
@@ -70,4 +79,12 @@ class BleScanner @Inject constructor(
             scanner.stopScan(callback)
         }
     }
+
+}
+
+internal fun shouldEmitUpdatedDevice(
+    previous: ScannedDevice?,
+    newDevice: ScannedDevice
+): Boolean {
+    return previous == null || previous != newDevice
 }
