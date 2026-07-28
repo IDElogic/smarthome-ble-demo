@@ -41,7 +41,14 @@ class ScanViewModel @Inject constructor(
                     _isScanning.value = false
                 }
                 .collect { device ->
-                    _devices.value = _devices.value + device
+                    val current = _devices.value.toMutableList()
+                    val index = current.indexOfFirst { it.address == device.address }
+                    if (index >= 0) {
+                        current[index] = device  // frissítés
+                    } else {
+                        current.add(device)       // új eszköz
+                    }
+                    _devices.value = current
                 }
         }
     }

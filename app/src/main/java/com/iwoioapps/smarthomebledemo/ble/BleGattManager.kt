@@ -40,6 +40,12 @@ class BleGattManager @Inject constructor(
     private val _switchState = MutableStateFlow(SwitchState())
     val switchState: StateFlow<SwitchState> = _switchState.asStateFlow()
 
+    private var temperatureCharacteristic: BluetoothGattCharacteristic? = null
+
+    private val _temperature = MutableStateFlow<Float?>(null)
+    val temperature: StateFlow<Float?> = _temperature.asStateFlow()
+
+
     @SuppressLint("MissingPermission")
     fun connect(address: String) {
         val device = bluetoothAdapter.getRemoteDevice(address)
@@ -108,9 +114,14 @@ class BleGattManager @Inject constructor(
             }
             switchCharacteristic = service.getCharacteristic(BleConstants.SWITCH_CHARACTERISTIC_UUID)
             brightnessCharacteristic = service.getCharacteristic(BleConstants.BRIGHTNESS_CHARACTERISTIC_UUID)
+            temperatureCharacteristic = service.getCharacteristic(BleConstants.TEMPERATURE_CHARACTERISTIC_UUID)
 
             switchCharacteristic?.let { enableNotifications(g, it) }
             brightnessCharacteristic?.let { g.readCharacteristic(it) }
+            temperatureCharacteristic?.let {
+                enableNotifications(g, it)   // notify, ha az eszköz támogatja
+                g.readCharacteristic(it)     // + egyszer rögtön olvassuk is
+            }
 
             _connectionState.value = ConnectionState.Ready
         }
@@ -143,6 +154,15 @@ class BleGattManager @Inject constructor(
                 }
                 BleConstants.BRIGHTNESS_CHARACTERISTIC_UUID -> {
                     _switchState.value = _switchState.value.copy(brightness = value)
+                }
+                BleConstants.TEMPERATURE_CHARACTERISTIC_UUID -> {
+                    val raw = characteristic.value
+                        ?.takeIf { it.size >= 2 }
+                        ?.let { bytes ->
+                            val sint16 = (bytes[1].toInt() shl 8) or (bytes[0].toInt() and 0xFF)
+                            sint16 / 100.0f
+                        }
+                    _temperature.value = raw
                 }
             }
         }

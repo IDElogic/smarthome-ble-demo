@@ -25,6 +25,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.SignalCellular0Bar
+import androidx.compose.material.icons.filled.SignalCellular4Bar
+import androidx.compose.material.icons.filled.SignalCellularAlt2Bar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -42,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -263,6 +267,30 @@ private fun DeviceRow(device: ScannedDevice, onClick: () -> Unit) {
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
+            device.temperature?.let { temp ->
+                Text(
+                    text = "%.1f°C".format(temp),
+                    color = Ros,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            Icon(
+                imageVector = when {
+                    device.rssi > -60 -> Icons.Filled.SignalCellular4Bar
+                    device.rssi > -75 -> Icons.Filled.SignalCellularAlt2Bar
+                    else              -> Icons.Filled.SignalCellular0Bar
+                },
+                contentDescription = "Signal strength: ${device.rssi} dBm",
+                tint = when {
+                    device.rssi > -60 -> Color(0xFF4CAF50)  // zöld
+                    device.rssi > -75 -> Color(0xFFFFC107)  // sárga
+                    else              -> Color(0xFFF44336)  // piros
+                },
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "${device.rssi} dBm",
                 color = Zuzmo,

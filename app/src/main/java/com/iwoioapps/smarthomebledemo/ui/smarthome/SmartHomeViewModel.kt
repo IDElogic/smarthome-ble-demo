@@ -6,6 +6,7 @@ import com.iwoioapps.smarthomebledemo.ble.BleGattManager
 import com.iwoioapps.smarthomebledemo.ble.ConnectionState
 import com.iwoioapps.smarthomebledemo.ble.SwitchState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
@@ -19,6 +20,10 @@ class SmartHomeViewModel @Inject constructor(
 
     /** Exposed read-only so the UI can show which peripheral it's talking to. */
     val deviceAddress: String get() = address
+
+    val temperature: StateFlow<Float?> = gattManager.temperature
+    //fake test
+    //val temperature: StateFlow<Float?> = MutableStateFlow(23.4f)
 
     val connectionState: StateFlow<ConnectionState> = gattManager.connectionState
     val switchState: StateFlow<SwitchState> = gattManager.switchState

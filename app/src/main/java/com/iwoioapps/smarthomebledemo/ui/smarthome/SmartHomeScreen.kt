@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.iwoioapps.smarthomebledemo.ble.ConnectionState
@@ -67,7 +68,6 @@ import com.iwoioapps.smarthomebledemo.ui.theme.Zuzmo
  * peripheral. Visual language (dark hero card, dusty-rose accent, small stat
  * cards) is a custom "smart home panel" design built for this demo.
  */
-
 
 
 @Composable
@@ -93,6 +93,9 @@ fun SmartHomeScreen(
         animationSpec = tween(300),
         label = "glowColor"
     )
+
+    val temperature by viewModel.temperature.collectAsState()
+
 
     Box(
         modifier = Modifier
@@ -301,6 +304,18 @@ fun SmartHomeScreen(
                     label = "DEVICE",
                     value = viewModel.deviceAddress,
                     valueColor = Wheat
+                )
+            }
+
+            temperature?.let { temp ->
+                Spacer(modifier = Modifier.height(12.dp))
+                StatCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    tint = StatCardTintA,
+                    icon = Icons.Filled.Thermostat,
+                    label = "TEMPERATURE",
+                    value = "%.1f°C".format(temp),
+                    valueColor = Ros
                 )
             }
 

@@ -38,4 +38,8 @@ class ScanViewModelFilterTest {
         val result = ScanViewModel.filterDevices(devices, "zzz")
         assertTrue(result.isEmpty())
     }
+
+
+
+
 }

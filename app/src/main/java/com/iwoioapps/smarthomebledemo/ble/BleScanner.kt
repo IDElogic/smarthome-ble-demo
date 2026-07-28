@@ -24,7 +24,7 @@ class BleScanner @Inject constructor(
 ) {
     @SuppressLint("MissingPermission")
 
-    fun scan(filterByServiceUuid: Boolean = true): Flow<ScannedDevice> = callbackFlow {
+    fun scan(filterByServiceUuid: Boolean = false): Flow<ScannedDevice> = callbackFlow {
         val scanner = bluetoothAdapter.bluetoothLeScanner
             ?: throw IllegalStateException("Bluetooth is off or unsupported on this device.")
 
@@ -37,11 +37,21 @@ class BleScanner @Inject constructor(
         val callback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 val address = result.device.address
+                val rawTemperature = result.scanRecord
+                    ?.getManufacturerSpecificData(0x004C) // fake manufacturer ID
+                    ?.takeIf { it.size >= 2 }
+                    ?.let { bytes ->
+                        val raw = ((bytes[0].toInt() and 0xFF) shl 8) or (bytes[1].toInt() and 0xFF)
+                        raw / 100.0f  // pl. 0x0926 = 2342 → 23.42°C
+                    }
+
                 val newDevice = ScannedDevice(
                     name = result.device.name ?: result.scanRecord?.deviceName,
                     address = address,
-                    rssi = result.rssi
+                    rssi = result.rssi,
+                    temperature = rawTemperature
                 )
+
 
                 val previous = lastSeenByAddress[address]
 
